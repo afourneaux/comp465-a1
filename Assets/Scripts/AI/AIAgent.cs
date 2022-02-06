@@ -6,6 +6,8 @@ namespace AI
     {
         public float maxSpeed;
         public float maxDegreesDelta;
+        public float initialSpeed;
+        public float acceleration;
         public bool lockY = true;
         public bool debug;
 
@@ -57,6 +59,10 @@ namespace AI
             animator = GetComponent<Animator>();
         }
 
+        private void Start() {
+            Velocity = transform.forward * initialSpeed;
+        }
+
         private void Update()
         {
             if (debug)
@@ -73,11 +79,11 @@ namespace AI
             else
             {
                 GetSteeringSum(out steeringSum, out rotationSum);
-                Velocity = steeringSum * Time.deltaTime;
+                Velocity = Vector3.Lerp(Velocity, steeringSum, acceleration);
                 Velocity = Vector3.ClampMagnitude(Velocity, maxSpeed);
             }
 
-            transform.position += Velocity;
+            transform.position += Velocity * Time.deltaTime;
             transform.rotation = Quaternion.RotateTowards(transform.rotation, transform.rotation * rotationSum, maxDegreesDelta * Time.deltaTime);
             
             if (Mathf.Abs(transform.position.x) > GameConstants.STAGE_WIDTH / 2) {
@@ -128,8 +134,9 @@ namespace AI
             AIMovement[] movements = GetComponents<AIMovement>();
             foreach (AIMovement movement in movements)
             {
-                steeringForceSum += movement.GetSteering(this).linear;
-                rotation *= movement.GetSteering(this).angular;
+                SteeringOutput output = movement.GetSteering(this);
+                steeringForceSum += output.linear;
+                rotation *= output.angular;
             }
         }
     }
