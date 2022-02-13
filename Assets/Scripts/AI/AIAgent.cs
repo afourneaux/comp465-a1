@@ -8,8 +8,11 @@ namespace AI
         public float maxDegreesDelta;
         public float initialSpeed;
         public float acceleration;
+        public float speedBoostValue;
         public bool lockY = true;
         public bool debug;
+        public bool isFrozen = false;
+        public bool hasSpeedBoost = false;
 
         public enum EBehaviorType { Kinematic, Steering }
         public EBehaviorType behaviorType;
@@ -82,12 +85,26 @@ namespace AI
                 if (debug) {
                     Debug.DrawRay(transform.position + Velocity, steeringSum * acceleration, Color.green);
                 }
-                Velocity += steeringSum * acceleration * Time.deltaTime;
-                Velocity = Vector3.ClampMagnitude(Velocity, maxSpeed);
+                Vector3 accelerationValue = steeringSum * acceleration * Time.deltaTime;
+                if (hasSpeedBoost) {
+                    accelerationValue *= speedBoostValue;
+                }
+                Velocity += accelerationValue;
+                Velocity = Vector3.ClampMagnitude(Velocity, hasSpeedBoost ? maxSpeed * speedBoostValue : maxSpeed);
             }
 
             transform.position += Velocity * Time.deltaTime;
             transform.rotation = Quaternion.RotateTowards(transform.rotation, transform.rotation * rotationSum, maxDegreesDelta * Time.deltaTime);
+            
+            // If the player hits the top or bottom of the stage, bounce them back
+            if (transform.position.z > GameConstants.STAGE_TOP) {
+                transform.position = new Vector3(transform.position.x, transform.position.y, GameConstants.STAGE_TOP);
+                Velocity = new Vector3(Velocity.x, Velocity.y, -Velocity.z);
+            }
+            if (transform.position.z < GameConstants.STAGE_BOTTOM) {
+                transform.position = new Vector3(transform.position.x, transform.position.y, GameConstants.STAGE_BOTTOM);
+                Velocity = new Vector3(Velocity.x, Velocity.y, -Velocity.z);
+            }
             
             if (Mathf.Abs(transform.position.x) > GameConstants.STAGE_WIDTH / 2) {
                 float x = transform.position.x;
