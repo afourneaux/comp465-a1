@@ -5,3 +5,6 @@
 ![Pp]roject[Ss]ettings/
 !.gitignore
 !.github/
+!*.txt
+!Arrive comparison.png
+!Seek comparison.png

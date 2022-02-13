@@ -1,0 +1,125 @@
+// SETUP
+Vector2 pc = new Vector2(3,6);
+Vector2 vc = new Vector2(2,3);
+Vector2 pt = new Vector2(5,4);
+float t = 0.25f;
+float mv = 3.6f;
+float am = 12.25f;
+
+// A. KINEMATIC
+
+Vector2 newLoc = pc;
+Vector2 targetDirection;
+float velocity = vc.magnitude;
+
+for (int i = 0; i < 5; i++) {
+    targetDirection = pt - newLoc;
+    if (velocity * t > targetDirection.magnitude) {
+        newLoc = pt;                                                    // Arrive at the target
+    } else {
+        newLoc = newLoc + (targetDirection.normalized * velocity * t);  // Move towards the target
+    }
+    velocity = Mathf.Min(mv, velocity + (am * t));      // Increase velocity by acceleration, capped by max velocity
+    
+    Debug.Log("Step " + (i + 1) + " - x: " + newLoc.x + " y: " + newLoc.y);
+}
+
+// OUTPUT
+
+Step 1 - x: 3.637378 y: 5.362623
+Step 2 - x: 4.273774 y: 4.726227
+Step 3 - x: 4.91017 y: 4.08983
+Step 4 - x: 5 y: 4
+Step 5 - x: 5 y: 4
+
+/*
+Starting from the given start position (3, 6), we calculate the direction towards the endpoint (5, 4) in a straight line.
+With this resulting vector, we can multiply by the velocity over this time interval and add the result to the current position.
+In this case, the normalised target direction is roughly (0.7, -0.7) so we multiply the starting velocity of 3.6 * 0.25 = (0.63, -0.63)
+Add this to the starting location and we have (3.63, 5.36). Note that the target direction was an approximation, so the final
+results have additional precision.
+*/
+
+
+
+// B. STEERING
+
+newLoc = pc;
+Vector2 actualDirection = vc;
+
+for (int i = 0; i < 5; i++) {
+    targetDirection = pt - newLoc;
+    if (targetDirection.magnitude > 1) {
+        actualDirection += targetDirection * am * t;
+        actualDirection = Vector2.ClampMagnitude(actualDirection, mv);
+        newLoc += actualDirection * t;
+    } else {
+        newLoc = pt;
+    }
+    Debug.Log("Step " + (i + 1) + " - x: " + newLoc.x + " y: " + newLoc.y);
+}
+
+Step 1 - x: 3.840011 y: 5.676919
+Step 2 - x: 4.499091 y: 5.064046
+Step 3 - x: 5.029904 y: 4.337246
+Step 4 - x: 5 y: 4
+Step 5 - x: 5 y: 4
+
+/*
+In Steering behaviour, the object is already moving at speed (2, 3). We start by calculating the desired trajectory (2, -2) as before.
+From here, we calculate the new velocity v1 = v0 + at where a = 12.25 * desiredTrajectory and t = 0.25. The result is v1 = (8.125, -3.125)
+This has a magnitude greater than 3.6, so we clamp v1 to (3.36, -1.29). We can then add v1 * t into our current position to get (3.84, 5.68)
+*/
+
+// C. Comparison
+
+/*
+Kinematic seek moves in a straight line towards its goal, as it does not preserve or consider existing velocity or acceleration.
+Steering, however, creates a curve towards the goal, as well as increasing in speed up to the stated maximum velocity.
+See "Seek comparison.png" for a graph plotting the courses.
+*/
+
+// D. Kinematic Arrive
+newLoc = pc;
+
+float t2t = 0.55f;
+float r = 0.5f;
+
+for (int i = 0; i < 5; i++) {
+    targetDirection = pt - newLoc;
+    if (targetDirection.magnitude < r) {
+        newLoc = newLoc + (targetDirection.normalized * Mathf.Min(velocity, targetDirection.magnitude / t2t) * t;   // Arrive at the target
+    } else {
+        newLoc = newLoc + (targetDirection.normalized * velocity * t);  // Move towards the target
+    }
+    velocity = Mathf.Min(mv, velocity + (am * t));      // Increase velocity by acceleration, capped by max velocity
+    
+    Debug.Log("Step " + (i + 1) + " - x: " + newLoc.x + " y: " + newLoc.y);
+}
+
+Step 1 - x: 3.636396 y: 5.363604
+Step 2 - x: 4.272792 y: 4.727208
+Step 3 - x: 4.909188 y: 4.090812
+Step 4 - x: 4.950466 y: 4.049534
+Step 5 - x: 4.972981 y: 4.027019
+
+/*
+If the magnitude of the difference between the current location and the goal is less than the satisfaction radius, 0.5,
+we begin to slow the velocity. Specifically, we determine the velocity by dividing the target direction vector by t2t 0.55.
+*/
+
+// E. Steering Arrive
+
+Step 1 - x: 3.840011 y: 5.676919
+Step 2 - x: 4.499091 y: 5.064046
+Step 3 - x: 4.891245 y: 4.624604
+Step 4 - x: 5.100916 y: 4.326807
+Step 5 - x: 5.193137 y: 4.137058
+
+// F. Arrive comparison
+
+/*
+Kinematic arrive moves directly towards the goal but, as it approaches it, it slows down until finally arriving.
+Steering arrive arcs towards the goal, tightening its arc and slowing its movement when it enters the slow radius.
+See "Arrive comparison.png" for a graph plotting the courses
+*/

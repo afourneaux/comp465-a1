@@ -79,7 +79,10 @@ namespace AI
             else
             {
                 GetSteeringSum(out steeringSum, out rotationSum);
-                Velocity = Vector3.Lerp(Velocity, steeringSum, acceleration);
+                if (debug) {
+                    Debug.DrawRay(transform.position + Velocity, steeringSum * acceleration, Color.green);
+                }
+                Velocity += steeringSum * acceleration * Time.deltaTime;
                 Velocity = Vector3.ClampMagnitude(Velocity, maxSpeed);
             }
 

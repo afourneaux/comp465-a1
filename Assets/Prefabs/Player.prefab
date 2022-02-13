@@ -237,10 +237,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d3307eea0187a26408f4a5b295b0d742, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 2
+  maxSpeed: 3
   maxDegreesDelta: 20
   initialSpeed: 0
-  acceleration: 0.1
+  acceleration: 1
   lockY: 1
   debug: 1
   behaviorType: 1
@@ -263,3 +263,4 @@ MonoBehaviour:
   stopRadius: 0.1
   arcScalar: 5
   speedThreshold: 0.2
+  t2t: 0
