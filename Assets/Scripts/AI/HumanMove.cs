@@ -65,19 +65,21 @@ namespace AI
 
             if (distance <= stopRadius) {
                 // ALREADY AT LOCATION
-                desiredVelocity = Vector3.zero;
+                desiredVelocity = -agent.Velocity;
             } else if (agent.Velocity.magnitude < speedThreshold && distance < stepRadius) {
                 // CONSIDERED SLOW SPEED AND NEAR ENOUGH TO THE GOAL
                 desiredVelocity *= Mathf.Clamp((distance / stepRadius), 0.0f, speedThreshold);
+            } else if (distance < stepRadius) {
+                // ENTERING STEP RADIUS AT HIGH SPEED, SLOW DOWN
+                desiredVelocity *= -1;
             } else {
                 desiredRotation = Quaternion.AngleAxis(angleY, Vector3.up);
 
                 if (Mathf.Abs(angleY) < arcScalar / Mathf.Max(agent.Velocity.magnitude, 0.1f)) {
                     // Angle is within player sight
-                    desiredVelocity = transform.forward * agent.maxSpeed;
                 } else {
                     // Angle is outside of player sight
-                    desiredVelocity = Vector3.zero;
+                    desiredVelocity = -agent.Velocity;
                 }
             }
             

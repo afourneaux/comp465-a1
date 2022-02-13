@@ -1,0 +1,33 @@
+40022711
+Alexander Fourneaux
+COMP 476 Assignment 1
+
+
+Notes on external resources:
+Daniel's demo was used as a base to sort out the basic class system in a component-oriented way.
+House model and textures by Tammie Waters, who kindly provided when I asked for "a random 3D model to stick in my assignment"
+Doughnut and grass textures taken from online.
+
+
+
+R2 and R3 are separated into different scenes. R2 can be demonstrated using the Part1 scene, and R3 will be demonstrated in Part2.
+
+Part 1 - Four players exist in the scene:
+1. Arrive behaviour with an initial speed of 3 and an out-of-sight target to the left. The player stops, adjusts, and begins moving again.
+2. Arrive behaviour with an in-sight target which crosses the left-right looping of the map. The player continues straight before arriving.
+3. Arrive behaviour whilst inside of the step radius. The player steps towards the centre without rotating.
+4. Flee behaviour whilst inside of the step radius. The player steps out of the radius, then speeds away.
+
+Please note that I opted to use steering behaviour for this exercise rather than kinematic. I hope you agree that steering is simply more interesting.
+
+Part 2 - Freeze Tag
+The rules of the game operate to spec. The "It" character is randomly determined by a game controller, and given a properly nefarious top hat.
+The "It" character has a 1.5x speed boost to enable them to actually complete the game.
+If the "It" character does not have an active target, they search for the nearest one. This takes into account looping on the x axis.
+The "It" character chases their quarry using Pursue behaviour, and the target is alerted to flee their pursuer. The target does not change until they are caught.
+When caught, the player is frozen. They are encased in ice, and slide to a stop. The "It" player then searches for the next nearest target.
+Meanwhile, other players are wandering by picking random points on the map and walking to them. When they finish their wander, they search for the nearest frozen player.
+If no player is found, they pick a new point to wander to. If a player is found, they walk to that player and tag them to unfreeze them.
+While a frozen player has another player approaching them to tag them, they do not appear in anyone else's search for a frozen player.
+In other words, two players will not try to unfreeze the same player.
+When all players are frozen, the "It" character does a victory dance for 5 seconds and returns to the centre of the field before the game begins anew with the last frozen player as "It".
